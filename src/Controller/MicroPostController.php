@@ -55,6 +55,20 @@ class MicroPostController extends AbstractController
     }
 
     /**
+     * @Route("/delete/{id}", name="micro_post_delete")
+     */
+    public function delete(MicroPost $microPost)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($microPost);
+        $em->flush();
+
+        $this->addFlash('success', "Micro post deleted");
+
+        return $this->redirectToRoute('micro_post_index');
+    }
+
+    /**
      * @Route("/add", name="micro_post_add")
      */
     public function add(Request $request)
