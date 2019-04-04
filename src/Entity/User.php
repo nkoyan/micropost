@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -51,6 +53,16 @@ class User implements UserInterface, \Serializable
      * @Assert\Length(min="4", max="50")
      */
     private $fullname;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\MicroPost", mappedBy="user")
+     */
+    private $microPosts;
+
+    public function __construct()
+    {
+        $this->microPosts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -153,17 +165,39 @@ class User implements UserInterface, \Serializable
         return serialize([$this->id, $this->username, $this->password]);
     }
 
-    /**
-     * Constructs the object
-     * @link https://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
-     * @since 5.1.0
-     */
     public function unserialize($serialized)
     {
         [$this->id, $this->username, $this->password] = unserialize($serialized, ['allowed_classes' => false]);
+    }
+
+    /**
+     * @return Collection|MicroPost[]
+     */
+    public function getMicroPosts(): Collection
+    {
+        return $this->microPosts;
+    }
+
+    public function addMicroPost(MicroPost $microPost): self
+    {
+        if (!$this->microPosts->contains($microPost)) {
+            $this->microPosts[] = $microPost;
+            $microPost->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMicroPost(MicroPost $microPost): self
+    {
+        if ($this->microPosts->contains($microPost)) {
+            $this->microPosts->removeElement($microPost);
+            // set the owning side to null (unless already changed)
+            if ($microPost->getUser() === $this) {
+                $microPost->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
