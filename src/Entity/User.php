@@ -200,4 +200,11 @@ class User implements UserInterface, \Serializable
 
         return $this;
     }
+
+    public function getInitials()
+    {
+        return array_reduce(explode(' ', $this->fullname), function ($acc, $value) {
+            return $acc . $value[0];
+        }, '');
+    }
 }
