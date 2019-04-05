@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\MicroPost;
 use App\Form\MicroPostType;
 use App\Repository\MicroPostRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,6 +28,7 @@ class MicroPostController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="micro_post_edit")
+     * @Security("is_granted('edit', microPost)", message="Access Denied.")
      */
     public function edit(Request $request, MicroPost $microPost)
     {
@@ -56,6 +59,7 @@ class MicroPostController extends AbstractController
 
     /**
      * @Route("/delete/{id}", name="micro_post_delete")
+     * @Security("is_granted('delete', microPost)", message="Access Denied.")
      */
     public function delete(MicroPost $microPost)
     {
@@ -70,16 +74,19 @@ class MicroPostController extends AbstractController
 
     /**
      * @Route("/add", name="micro_post_add")
+     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request)
     {
         $microPost = new MicroPost();
-        $microPost->setTime(new \DateTime());
 
         $form = $this->createForm(MicroPostType::class, $microPost);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $microPost->setTime(new \DateTime());
+            $microPost->setUser($this->getUser());
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($microPost);
             $em->flush();

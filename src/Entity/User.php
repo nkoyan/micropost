@@ -16,6 +16,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface, \Serializable
 {
+    const ROLE_USER = 'ROLE_USER';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -91,11 +94,7 @@ class User implements UserInterface, \Serializable
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return $this->roles;
     }
 
     public function setRoles(array $roles): self
@@ -201,10 +200,10 @@ class User implements UserInterface, \Serializable
         return $this;
     }
 
-    public function getInitials()
+    public function initials()
     {
-        return array_reduce(explode(' ', $this->fullname), function ($acc, $value) {
+        return strtoupper(array_reduce(explode(' ', $this->fullname), function ($acc, $value) {
             return $acc . $value[0];
-        }, '');
+        }, ''));
     }
 }
