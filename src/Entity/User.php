@@ -62,9 +62,26 @@ class User implements UserInterface, \Serializable
      */
     private $microPosts;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="following")
+     */
+    private $followers;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="followers")
+     * @ORM\JoinTable(
+     *     name="following",
+     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="following_user_id", referencedColumnName="id")}
+     *     )
+     */
+    private $following;
+    
     public function __construct()
     {
         $this->microPosts = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+        $this->following = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,7 +96,7 @@ class User implements UserInterface, \Serializable
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
     }
 
     public function setUsername(string $username): self
@@ -109,7 +126,7 @@ class User implements UserInterface, \Serializable
      */
     public function getPassword(): string
     {
-        return (string) $this->password;
+        return (string)$this->password;
     }
 
     public function setPassword(string $password): self
@@ -205,5 +222,21 @@ class User implements UserInterface, \Serializable
         return strtoupper(array_reduce(explode(' ', $this->fullname), function ($acc, $value) {
             return $acc . $value[0];
         }, ''));
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getFollowing(): Collection
+    {
+        return $this->following;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\MicroPost;
+use App\Entity\User;
 use App\Form\MicroPostType;
 use App\Repository\MicroPostRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -48,6 +49,17 @@ class MicroPostController extends AbstractController
     }
 
     /**
+     * @Route("/user/{username}", name="micro_post_user")
+     */
+    public function userPosts(User $userWithPosts, MicroPostRepository $repo)
+    {
+        return $this->render('micro-post/user-posts.html.twig', [
+            'posts' => $repo->findBy(['user' => $userWithPosts], ['time' => 'DESC']),
+            'user' => $userWithPosts
+        ]);
+    }
+
+    /**
      * @Route("/{id<\d+>}", name="micro_post_show")
      */
     public function show(MicroPost $microPost)
@@ -84,7 +96,6 @@ class MicroPostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $microPost->setTime(new \DateTime());
             $microPost->setUser($this->getUser());
 
             $em = $this->getDoctrine()->getManager();
