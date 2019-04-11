@@ -58,6 +58,11 @@ class User implements UserInterface, \Serializable
     private $fullname;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\MicroPost", mappedBy="likedBy")
+     */
+    private $postsLiked;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\MicroPost", mappedBy="user")
      */
     private $microPosts;
@@ -82,6 +87,7 @@ class User implements UserInterface, \Serializable
         $this->microPosts = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
+        $this->postsLiked = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -252,5 +258,13 @@ class User implements UserInterface, \Serializable
         if ($this->following->contains($user)) {
             $this->following->removeElement($user);
         }
+    }
+
+    /**
+     * @return Collection|MicroPost[]
+     */
+    public function getPostsLiked(): Collection
+    {
+        return $this->postsLiked;
     }
 }
