@@ -2,4 +2,70 @@
 
 {% block body %}
     {{ include('micro-post/_post.html.twig', {'post': post}) }}
+
+    {% set isLiked = post.likedBy.contains(app.user) %}
+
+    <div class="pt-2 ">
+
+        <button style="display: {{ not isLiked ? 'block' : 'none' }}"
+                class="btn btn-outline-secondary btn-sm" id="js-like">
+            Like <span class="badge badge-light" id="js-likes-like">{{ post.likedBy.count }}</span>
+        </button>
+
+        <button style="display: {{ isLiked ? 'block' : 'none' }}"
+                class="btn btn-outline-danger btn-sm" id="js-unlike">
+            Unlike <span class="badge badge-light" id="js-likes-unlike">{{ post.likedBy.count }}</span>
+        </button>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        let likeButton = document.getElementById('js-like')
+        let unlikeButton = document.getElementById('js-unlike')
+
+        addOnClick(
+            likeButton,
+            unlikeButton,
+            document.getElementById('js-likes-unlike'),
+            '{{ path('likes_like', {'id': post.id}) }}'
+        )
+
+        addOnClick(
+            unlikeButton,
+            likeButton,
+            document.getElementById('js-likes-like'),
+            '{{ path('likes_unlike', {'id': post.id}) }}'
+        )
+
+        function switchButtons (button, oppositeButton) {
+            button.disabled = false
+            button.style.display = 'none'
+            oppositeButton.style.display = 'block'
+        }
+
+        function addOnClick(button, oppositeButton, likeCount, path) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault()
+                {% if not app.user %}
+                    return window.location.replace('{{ path('user_register') }}')
+                {% endif %}
+
+                button.disabled = true
+
+                fetch(path, {'credentials': 'include'}).then(function (response) {
+                    response.json().then(function (json) {
+                        likeCount.innerText = json.count
+                        switchButtons(button, oppositeButton)
+                    })
+                }).catch(function () {
+                    switchButtons(button, oppositeButton)
+                })
+            })
+        }
+
+    </script>
 {% endblock %}

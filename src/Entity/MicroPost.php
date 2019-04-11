@@ -118,4 +118,11 @@ class MicroPost
             $this->likedBy[] = $user;
         }
     }
+
+    public function unlike(User $user)
+    {
+        if ($this->likedBy->contains($user)) {
+            $this->likedBy->removeElement($user);
+        }
+    }
 }
