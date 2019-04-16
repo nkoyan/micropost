@@ -31,6 +31,8 @@ security:
                 csrf_token_generator: security.csrf.token_manager
                 default_target_path: micro_post_index
 
+            user_checker: App\Security\UserEnabledChecker
+
             logout:
                 path: security_logout
                 target : micro_post_index
