@@ -35,3 +35,10 @@ services:
     App\EventListener\LikeNotificationSubscriber:
         tags:
             - { name: doctrine.event_subscriber, connection: default}
+
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            #- 'mysql:dbname=mydatabase; host=myhost; port=myport'
+            #- { db_username: myuser, db_password: mypassword }
+            - !service { class: PDO, factory: 'database_connection:getWrappedConnection' }
+            - { lock_mode: 1 }
