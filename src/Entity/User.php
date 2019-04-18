@@ -91,6 +91,11 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="boolean")
      */
     private $enabled = false;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\UserPreferences", cascade={"persist"})
+     */
+    private $preferences;
     
     public function __construct()
     {
@@ -312,5 +317,21 @@ class User implements UserInterface, \Serializable
     public function setEnabled(bool $enable): void
     {
         $this->enabled = $enable;
+    }
+
+    /**
+     * @return null|UserPreferences
+     */
+    public function getPreferences()
+    {
+        return $this->preferences;
+    }
+
+    /**
+     * @param UserPreferences $preferences
+     */
+    public function setPreferences(UserPreferences $preferences): void
+    {
+        $this->preferences = $preferences;
     }
 }

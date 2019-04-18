@@ -29,7 +29,7 @@ class Mailer
         $this->mailFrom = $mailFrom;
     }
 
-    public function senConfiramationEmail(User $user)
+    public function sendConfirmationEmail(User $user)
     {
         $body = $this->twig->render('email/registration.html.twig', [
             'user' => $user
