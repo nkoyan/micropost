@@ -53,7 +53,7 @@ jobs:
           command: yarn install && yarn build
       - run:
           name: Add server
-          command: ssh-keyscan -H $SERVER_IP >> ~/.ssh/know_hosts
+          command: ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
       - run:
           name: Pre-deploy
           command: ssh -T $SERVER_USER@$SERVER_IP < bin/deploy/pre_deploy.sh
